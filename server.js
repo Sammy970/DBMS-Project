@@ -121,39 +121,6 @@ async function checkCred(username, password, res) {
     }
 }
 
-async function searchPDF(searchQuery) {
-    await client.connect();
-    const database = await client.db().admin().listDatabases();
-    const dbList = database.databases.map(db => db.name);
-
-    dbList.forEach(async function (dbName) {
-        const database = client.db(dbName);
-        var collection = {};
-        collection = await database.listCollections().toArray();
-        const colList = collection.map(db => db.name);
-
-        colList.forEach(async function (colName) {
-
-            const database = client.db(dbName)
-            const collection = database.collection(colName);
-
-            const find = await collection.findOne({ "tags": searchQuery });
-
-            try {
-                if(find.tags.includes("BPA") == true) {
-                    console.log(find.name);
-                    return;
-                }
-            }
-            catch (err) {
-                console.log("err")
-            }
-
-        })
-    })
-
-}
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.raw({ type: 'application/pdf', limit: '10mb' }));
 app.use(bodyParser.json());
@@ -182,7 +149,11 @@ app.post('/loginCred', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     checkCred(username, password, res);
+})
 
+app.post('/logout', async (req, res) => {
+    app.locals.loginState = "false"
+    res.redirect('/admin');
 })
 
 // Downloading PDF
@@ -283,11 +254,6 @@ app.get('/preview', async (req, res) => {
     var collectionName = app.locals.collectionName
     var dataName = app.locals.dataName
     previewPDF(databaseName, collectionName, dataName, res);
-})
-
-app.post('/search', async (req, res) => {
-    const searchQuery = req.body.search;
-    searchPDF(searchQuery);
 })
 
 const PORT = process.env.PORT || 3000;
