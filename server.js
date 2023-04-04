@@ -5,6 +5,14 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 
+// Importing Functions
+const getDBNames = require('./Functions/getDBNames');
+const getColNames = require('./Functions/getColNames'); 
+const getData = require('./Functions/getData');
+const downloadPDF = require('./Functions/downloadPDF');
+const uploadPDF = require('./Functions/uploadPDF');
+const previewPDF = require('./Functions/previewPDF');
+
 
 const uriLogin = "mongodb+srv://samyakTest:samyakTest@testcluster.eqeij01.mongodb.net/test"
 const uri = "mongodb+srv://samyak970:samyak970@dbms.krybkqj.mongodb.net/test"
@@ -16,84 +24,6 @@ const client = new MongoClient(uri)
 const clientLogin = new MongoClient(uriLogin)
 
 const upload = multer({ dest: 'uploads/' });
-
-
-
-async function getDBNames() {
-    await client.connect();
-    const database = await client.db().admin().listDatabases();
-    // console.log(database.databases);
-    const dbList = database.databases.map(db => db.name);
-    return dbList;
-}
-
-async function getColNames(databaseName) {
-    await client.connect();
-    const database = client.db(databaseName);
-
-    var collection = {};
-
-    collection = await database.listCollections().toArray();
-
-    const colList = collection.map(db => db.name);
-    return colList;
-}
-
-async function getData(databaseName, collectionName) {
-    await client.connect();
-    const database = client.db(databaseName)
-    const collection = database.collection(collectionName);
-
-    const colFind = await collection.find({})
-    const find = await colFind.map(doc => doc.name).toArray();
-    return find;
-}
-
-async function downloadPDF(databaseName, collectionName, dataName) {
-    await client.connect();
-    const database = client.db(databaseName)
-    const collection = database.collection(collectionName);
-
-    const find = await collection.findOne({ name: dataName });
-    const data1 = find.data.buffer;
-    const fileName = dataName + '.pdf';
-    // console.log(fileName);
-
-    fs.writeFileSync(fileName, data1, 'binary');
-}
-
-async function uploadPDF(databaseName, collectionName, pdfName, pdfFilePath) {
-    await client.connect();
-    const database = client.db(databaseName)
-    const collection = database.collection(collectionName);
-
-    const pdfFileData = fs.readFileSync(pdfFilePath);
-
-    const pdfDocument = {
-        name: pdfName,
-        data: new Binary(pdfFileData),
-        contentType: "application/pdf",
-        uploadDate: new Date(),
-    }
-
-    const result = await collection.insertOne(pdfDocument);
-    await client.close;
-}
-
-async function previewPDF(databaseName, collectionName, dataName, res) {
-    await client.connect();
-    const database = client.db(databaseName)
-    const collection = database.collection(collectionName);
-
-    const find = await collection.findOne({ name: dataName });
-    const data1 = find.data.buffer;
-    const fileName = dataName + '.pdf';
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-
-    res.send(data1);
-}
 
 async function checkCred(username, password, res) {
     await clientLogin.connect();
@@ -127,7 +57,6 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 
 app.get('/', async (req, res) => {
-    // const name = "Samyak Jain";
     const dbList = await getDBNames();
     res.render('user', { dbList });
 })
