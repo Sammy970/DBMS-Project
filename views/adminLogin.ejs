@@ -7,7 +7,18 @@
 
 <body>
 
-    <h1>Admin Login Page</h1>
+    <h1>Choose Section: </h1>
+    <form id="sectionForm" action="/section" method="POST" enctype="multipart/form-data">
+        <label for="section">Select Section</label>
+        <select name="section" id="section" required>
+            <option value="qp" selected="selected">Question Paper</option>
+            <option value="syllabus">Syllabus</option>
+            <option value="notes">Notes</option>
+        </select>
+        <!-- <button type="submit">Submit</button> -->
+    </form>
+
+    <h2>Admin Login Page</h2>
     <form id="loginForm" action="/loginCred" method="POST">
         <label for="username">Username</label>
         <input type="text" name="username" id="username">
@@ -19,8 +30,12 @@
         <button type="submit">Submit</button>
     </form>
 
+
+
     <div id="button">
     </div>
+
+
 
     <!-- import jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -35,10 +50,14 @@
                 const url = form.attr('action');
                 const user = $("#username").val();
                 const pass = $("#password").val();
+                const section = $("#section").val();
                 const data = {
                     "username": user,
                     "password": pass,
+                    "section": section,
                 }
+
+                console.log(data);
 
                 $.post(url, data, function (response) {
                     console.log(response);

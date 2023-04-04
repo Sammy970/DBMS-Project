@@ -9,6 +9,8 @@
 
     <h1>Admin Page to upload PDF</h1>
 
+
+
     <h2>Filter 1: Select Database</h2>
     <form id="myform4" action="/filter4" , method="POST" enctype="multipart/form-data">
         <label for="filterUP">Filter DB</label>
@@ -52,6 +54,22 @@
 
     <script>
         $(document).ready(function () {
+
+            $("#sectionForm").submit(function (event) {
+                event.preventDefault();
+                const form = $(this);
+                const url = form.attr('action');
+                const selection = $("#section").val();
+                const data = {
+                    "selection": selection
+                }
+
+                $.post(url, data, function (response) {
+                    console.log(response);
+                })
+
+            })
+
             $('#myform4').submit(function (event) {
                 event.preventDefault();
                 const form = $(this);
