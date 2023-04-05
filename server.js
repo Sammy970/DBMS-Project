@@ -53,10 +53,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.raw({ type: 'application/pdf', limit: '10mb' }));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
+app.use(express.static('public'));
+
 
 app.get('/', async (req, res) => {
     res.render('homepage');
 })
+
 
 app.get('/questionPaper', async (req, res) => {
     app.locals.selection = "qp"
@@ -79,7 +82,8 @@ app.get('/notes', async (req, res) => {
 app.get('/admin', async (req, res) => {
     if (app.locals.loginState == "true") {
         const dbList = await getDBNames(app.locals.selection);
-        res.render('admin', { dbList });
+        var selection = app.locals.selection
+        res.render('admin', { dbList, selection });
     } else {
         res.render('adminLogin');
     }
@@ -160,13 +164,17 @@ app.post('/filter4', async (req, res) => {
     res.send(colList);
 })
 
-app.post('/filter5', upload.single('pdf'), async (req, res) => {
+app.post('/filter5', async (req, res) => {
+    app.locals.collectionName = req.body.filterUP;
+    res.send("awesome");
+})
+
+app.post('/filter6', upload.single('pdf'), async (req, res) => {
     const databaseName = app.locals.databaseName;
-    const collectionName = req.body.filterUP;
     const pdfName = req.body.pdfName;
     const pdfFilePath = req.file.path;
 
-    await uploadPDF(databaseName, collectionName, pdfName, pdfFilePath, app.locals.selection);
+    await uploadPDF(databaseName, app.locals.collectionName, pdfName, pdfFilePath, app.locals.selection);
 
     uploadFolderPath = "./uploads"
 
@@ -189,8 +197,7 @@ app.post('/filter5', upload.single('pdf'), async (req, res) => {
         });
     })
 
-    res.status(200).send("Success");
-
+    res.send('<script>alert("Successfully uploaded!!"); window.location.href = "/admin"; </script>');
 })
 
 // Preview PDF
