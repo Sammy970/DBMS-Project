@@ -130,3 +130,7 @@ label input:valid+.label-text {
     -webkit-transform: translateY(-74px);
     transform: translateY(-74px);
 }
+
+.section-container {
+    margin-top: -20px;
+}
