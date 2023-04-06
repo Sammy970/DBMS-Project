@@ -30,6 +30,8 @@ async function getDBNames(selection) {
         }
 
         var dbList = database.databases.map(db => db.name);
+        dbList.pop();
+        dbList.pop();
         return dbList;
 
     }
