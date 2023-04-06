@@ -13,55 +13,52 @@ const clientNotes = new MongoClient(uriNotes);
 
 async function uploadPDF(databaseName, collectionName, pdfName, pdfFilePath, selection) {
 
-    switch (selection) {
-        case "qp":
+    try {
+
+        if (selection == "qp") {
             await clientQuestionPaper.connect();
-            var database = clientQuestionPaper.db(databaseName)
-            var collection = database.collection(collectionName);
-            var pdfFileData = fs.readFileSync(pdfFilePath);
-            var pdfDocument = {
-                name: pdfName,
-                data: new Binary(pdfFileData),
-                contentType: "application/pdf",
-                uploadDate: new Date(),
-            }
-            var result = await collection.insertOne(pdfDocument);
-            await clientQuestionPaper.close;
-            break;
+            var database = clientQuestionPaper.db(databaseName);
+        }
 
-        case "syllabus":
+        else if (selection == "syllabus") {
             await clientSyllabus.connect();
-            var database = clientSyllabus.db(databaseName)
-            var collection = database.collection(collectionName);
-            var pdfFileData = fs.readFileSync(pdfFilePath);
-            var pdfDocument = {
-                name: pdfName,
-                data: new Binary(pdfFileData),
-                contentType: "application/pdf",
-                uploadDate: new Date(),
-            }
-            var result = await collection.insertOne(pdfDocument);
-            await clientSyllabus.close;
-            break;
+            var database = clientSyllabus.db(databaseName);
+        }
 
-        case "notes":
+        else if (selection == "notes") {
             await clientNotes.connect();
-            var database = clientNotes.db(databaseName)
-            var collection = database.collection(collectionName);
-            var pdfFileData = fs.readFileSync(pdfFilePath);
-            var pdfDocument = {
-                name: pdfName,
-                data: new Binary(pdfFileData),
-                contentType: "application/pdf",
-                uploadDate: new Date(),
-            }
-            var result = await collection.insertOne(pdfDocument);
-            await clientNotes.close;
-            break;
+            var database = clientNotes.db(databaseName);
+        }
 
-        default:
-            console.log("default");
+        var collection = database.collection(collectionName);
+        var pdfFileData = fs.readFileSync(pdfFilePath);
+        var pdfDocument = {
+            name: pdfName,
+            data: new Binary(pdfFileData),
+            contentType: "application/pdf",
+            uploadDate: new Date(),
+        }
+        var result = await collection.insertOne(pdfDocument);
+
+
     }
+    catch (err) {
+        console.log("Error at uploadPDF");
+    }
+    finally {
+        if (selection == "qp") {
+            await clientQuestionPaper.close();
+        }
+
+        else if (selection == "syllabus") {
+            await clientSyllabus.close();
+        }
+
+        else if (selection == "notes") {
+            await clientNotes.close();
+        }
+    }
+
 
 }
 

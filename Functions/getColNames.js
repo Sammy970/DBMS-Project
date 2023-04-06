@@ -10,37 +10,49 @@ const clientSyllabus = new MongoClient(uriSyllabus)
 const clientNotes = new MongoClient(uriNotes);
 
 async function getColNames(databaseName, selection) {
-    switch (selection) {
-        case "qp":
+
+    try {
+
+        if (selection == "qp") {
             await clientQuestionPaper.connect();
             var database = clientQuestionPaper.db(databaseName);
-            var collection = {};
-            collection = await database.listCollections().toArray();
-            var colList = collection.map(db => db.name);
-            return colList;
-            break;
+        }
 
-        case "syllabus":
+        else if (selection == "syllabus") {
             await clientSyllabus.connect();
             var database = clientSyllabus.db(databaseName);
-            var collection = {};
-            collection = await database.listCollections().toArray();
-            var colList = collection.map(db => db.name);
-            return colList;
-            break;
+        }
 
-        case "notes":
+        else if (selection == "notes") {
             await clientNotes.connect();
             var database = clientNotes.db(databaseName);
-            var collection = {};
-            collection = await database.listCollections().toArray();
-            var colList = collection.map(db => db.name);
-            return colList;
-            break;
+        }
 
-        default:
-            console.log("Default")
+        var collection = {};
+        collection = await database.listCollections().toArray();
+        var colList = collection.map(db => db.name);
+        return colList;
+
     }
+    catch (err) {
+
+        console.log("Error at getColNames");
+
+    }
+    finally {
+        if (selection == "qp") {
+            await clientQuestionPaper.close();
+        }
+
+        else if (selection == "syllabus") {
+            await clientSyllabus.close();
+        }
+
+        else if (selection == "notes") {
+            await clientNotes.close();
+        }
+    }
+
 
 
 

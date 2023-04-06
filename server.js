@@ -115,6 +115,7 @@ app.post('/filter1', async (req, res) => {
 app.post('/filter2', async (req, res) => {
     const databaseName = req.body.data1;
     const collectionName = req.body.data2;
+
     const data = await getData(databaseName, collectionName, app.locals.selection);
     res.send(data);
     // console.log(data);

@@ -12,34 +12,45 @@ const clientNotes = new MongoClient(uriNotes);
 
 async function getDBNames(selection) {
 
-    switch (selection) {
-        case "qp":
+    try {
+
+        if (selection == "qp") {
             await clientQuestionPaper.connect();
             var database = await clientQuestionPaper.db().admin().listDatabases();
-            // console.log(database.databases);
-            var dbList = database.databases.map(db => db.name);
-            return dbList;
-            break;
+        }
 
-        case "syllabus":
+        else if (selection == "syllabus") {
             await clientSyllabus.connect();
             var database = await clientSyllabus.db().admin().listDatabases();
-            // console.log(database.databases);
-            var dbList = database.databases.map(db => db.name);
-            return dbList;
-            break;
+        }
 
-        case "notes":
+        else if (selection == "notes") {
             await clientNotes.connect();
             var database = await clientNotes.db().admin().listDatabases();
-            // console.log(database.databases);
-            var dbList = database.databases.map(db => db.name);
-            return dbList;
-            break;
+        }
 
-        default:
-            console.log("Default DB");
+        var dbList = database.databases.map(db => db.name);
+        return dbList;
+
     }
+    catch (err) {
+        console.log("Error at getDBNames");
+
+    }
+    finally {
+        if (selection == "qp") {
+            await clientQuestionPaper.close();
+        }
+
+        else if (selection == "syllabus") {
+            await clientSyllabus.close();
+        }
+
+        else if (selection == "notes") {
+            await clientNotes.close();
+        }
+    }
+
 
 }
 

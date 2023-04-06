@@ -11,38 +11,50 @@ const clientNotes = new MongoClient(uriNotes);
 
 async function getData(databaseName, collectionName, selection) {
 
-    switch (selection) {
-        case "qp":
+    try {
+
+        if (selection == "qp") {
             await clientQuestionPaper.connect();
-            var database = clientQuestionPaper.db(databaseName)
-            var collection = database.collection(collectionName);
+            var database = clientQuestionPaper.db(databaseName);
+        }
 
-            var colFind = await collection.find({})
-            var find = await colFind.map(doc => doc.name).toArray();
-            return find;
-            break;
-
-        case "syllabus":
+        else if (selection == "syllabus") {
             await clientSyllabus.connect();
-            var database = clientSyllabus.db(databaseName)
-            var collection = database.collection(collectionName);
+            var database = clientSyllabus.db(databaseName);
+        }
 
-            var colFind = await collection.find({})
-            var find = await colFind.map(doc => doc.name).toArray();
-            return find;
-            break;
-
-        case "notes":
+        else if (selection == "notes") {
             await clientNotes.connect();
-            var database = clientNotes.db(databaseName)
-            var collection = database.collection(collectionName);
+            var database = clientNotes.db(databaseName);
+        }
 
-            var colFind = await collection.find({})
-            var find = await colFind.map(doc => doc.name).toArray();
-            return find;
-            break;
+        var collection = database.collection(collectionName);
+
+        var colFind = await collection.find({})
+        var find = await colFind.map(doc => doc.name).toArray();
+        return find;
 
     }
+    catch (err) {
+        console.log("Error at getData");
+    }
+
+    finally {
+        if (selection == "qp") {
+            await clientQuestionPaper.close();
+        }
+
+        else if (selection == "syllabus") {
+            await clientSyllabus.close();
+        }
+
+        else if (selection == "notes") {
+            await clientNotes.close();
+        }
+    }
+
+
+
 
 }
 

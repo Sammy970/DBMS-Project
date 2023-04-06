@@ -11,47 +11,51 @@ const clientNotes = new MongoClient(uriNotes);
 
 async function previewPDF(databaseName, collectionName, dataName, res, selection) {
 
-    switch (selection) {
-        case "qp":
+
+    try {
+
+        if (selection == "qp") {
             await clientQuestionPaper.connect();
-            var database = clientQuestionPaper.db(databaseName)
-            var collection = database.collection(collectionName);
-            var find = await collection.findOne({ name: dataName });
-            var data1 = find.data.buffer;
-            var fileName = dataName + '.pdf';
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-            res.send(data1);
-            break;
+            var database = clientQuestionPaper.db(databaseName);
+        }
 
-        case "syllabus":
+        else if (selection == "syllabus") {
             await clientSyllabus.connect();
-            var database = clientSyllabus.db(databaseName)
-            var collection = database.collection(collectionName);
-            var find = await collection.findOne({ name: dataName });
-            var data1 = find.data.buffer;
-            var fileName = dataName + '.pdf';
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-            res.send(data1);
-            break;
+            var database = clientSyllabus.db(databaseName);
+        }
 
-        case "notes":
+        else if (selection == "notes") {
             await clientNotes.connect();
-            var database = clientNotes.db(databaseName)
-            var collection = database.collection(collectionName);
-            var find = await collection.findOne({ name: dataName });
-            var data1 = find.data.buffer;
-            var fileName = dataName + '.pdf';
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-            res.send(data1);
-            break;
+            var database = clientNotes.db(databaseName);
+        }
 
-        default:
-            console.log("Default Preview PDF");
+        var collection = database.collection(collectionName);
+        var find = await collection.findOne({ name: dataName });
+        var data1 = find.data.buffer;
+        var fileName = dataName + '.pdf';
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+        res.send(data1);
 
     }
+    catch (err) {
+        console.log("Error at previewPDF");
+    }
+    finally {
+        if (selection == "qp") {
+            await clientQuestionPaper.close();
+        }
+
+        else if (selection == "syllabus") {
+            await clientSyllabus.close();
+        }
+
+        else if (selection == "notes") {
+            await clientNotes.close();
+        }
+    }
+
+
 
 }
 

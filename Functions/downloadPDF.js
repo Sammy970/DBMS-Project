@@ -11,44 +11,58 @@ const clientSyllabus = new MongoClient(uriSyllabus)
 const clientNotes = new MongoClient(uriNotes);
 
 async function downloadPDF(databaseName, collectionName, dataName, selection) {
-    switch (selection) {
-        case "qp":
+
+    try {
+        if (selection == "qp") {
             await clientQuestionPaper.connect();
             var database = clientQuestionPaper.db(databaseName)
-            var collection = database.collection(collectionName);
-            var find = await collection.findOne({ name: dataName });
-            var data1 = find.data.buffer;
-            var fileName = dataName + '.pdf';
-            // console.log(fileName);
-            fs.writeFileSync(fileName, data1, 'binary');
-            break;
+        }
 
-        case "syllabus":
+        else if (selection == "syllabus") {
             await clientSyllabus.connect();
             var database = clientSyllabus.db(databaseName)
-            var collection = database.collection(collectionName);
-            var find = await collection.findOne({ name: dataName });
-            var data1 = find.data.buffer;
-            var fileName = dataName + '.pdf';
-            // console.log(fileName);
-            fs.writeFileSync(fileName, data1, 'binary');
-            break;
+        }
 
-        case "notes":
+        else if (selection == "notes") {
             await clientNotes.connect();
             var database = clientNotes.db(databaseName)
-            var collection = database.collection(collectionName);
-            var find = await collection.findOne({ name: dataName });
-            var data1 = find.data.buffer;
-            var fileName = dataName + '.pdf';
-            // console.log(fileName);
-            fs.writeFileSync(fileName, data1, 'binary');
-            break;
+        }
 
-        default:
-            console.log("Default Download PDF")
+        var collection = database.collection(collectionName);
+        var find = await collection.findOne({ name: dataName });
+        var data1 = find.data.buffer;
+
+        if (fs.existsSync("./downloadedPDF")) {
+            // Do nothing
+        } else {
+            // Make the folder
+            fs.mkdirSync("./downloadedPDF")
+        }
+
+        var fileName = "./downloadedPDF/" + dataName + '.pdf';
+        // console.log(fileName);
+        fs.writeFileSync(fileName, data1, 'binary');
+    }
+    catch (err) {
+        console.log("Error in downloadPDF Function");
+    }
+    finally {
+
+        if (selection == "qp") {
+            await clientQuestionPaper.close();
+        }
+
+        else if (selection == "syllabus") {
+            await clientSyllabus.close();
+        }
+
+        else if (selection == "notes") {
+            await clientNotes.close();
+        }
 
     }
+
+
 
 }
 
