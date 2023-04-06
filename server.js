@@ -136,7 +136,7 @@ app.post('/filter3', async (req, res) => {
 app.get('/download', (req, res) => {
     var dataName = app.locals.dataName;
 
-    const filePath = './' + dataName + '.pdf';
+    const filePath = './downloadedPDF/' + dataName + '.pdf';
     const fileName = dataName + '.pdf';
 
     // set the response headers to indicate that the response will contain a file
